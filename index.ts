@@ -152,6 +152,10 @@ const runSimulation = (simulationNumber: number) => {
     if (hand.includes(CARD.EGGXECUTOREX)) {
         return true;
     }
+    doTurn(hand, deck);
+    if (hand.includes(CARD.EGGXECUTOREX)) {
+        return true;
+    }
 
     return false;
 };
