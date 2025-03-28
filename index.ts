@@ -5,6 +5,7 @@ const CARD = {
     POKEBALL: "POKEBALL",
     PROFESSOR_RESEARCH: "PROFESSOR_RESEARCH",
     POKEMON_CONNECTION: "POKEMON_CONNECTION",
+    IONO: "IONO",
     DUMMY_CARD: "DUMMY_CARD",
 };
 
@@ -14,12 +15,14 @@ const createDeck = () => {
     deck.push(CARD.EGGXECUTOREX);
     deck.push(CARD.EGGXECUTOREX);
     deck.push(CARD.EGGXECUTE);
-    deck.push(CARD.EGGXECUTOR);
+    deck.push(CARD.POKEBALL);
     deck.push(CARD.POKEBALL);
     deck.push(CARD.PROFESSOR_RESEARCH);
     deck.push(CARD.PROFESSOR_RESEARCH);
     deck.push(CARD.POKEMON_CONNECTION);
     deck.push(CARD.POKEMON_CONNECTION);
+    deck.push(CARD.IONO);
+    deck.push(CARD.IONO);
 
     while (deck.length < 19) {
         deck.push(CARD.DUMMY_CARD);
@@ -34,11 +37,14 @@ const drawCard = (deck: string[], hand: string[]) => {
     hand.push(card);
 };
 
-const hasPlayableCard = (hand: string[], playedProfessorResearch: boolean) => {
+const hasPlayableCard = (hand: string[], playedTrainerCard: boolean) => {
     if (!hand.includes(CARD.EGGXECUTE) && hand.includes(CARD.POKEBALL)) {
         return true;
     }
-    if (!playedProfessorResearch && hand.includes(CARD.PROFESSOR_RESEARCH)) {
+    if (!playedTrainerCard && hand.includes(CARD.PROFESSOR_RESEARCH)) {
+        return true;
+    }
+    if (!playedTrainerCard && hand.includes(CARD.IONO)) {
         return true;
     }
     if (
@@ -53,12 +59,12 @@ const hasPlayableCard = (hand: string[], playedProfessorResearch: boolean) => {
 const showDebugLogs = false;
 
 const doTurn = (hand: string[], deck: string[]) => {
-    let playedProfessorResearch = false;
+    let playedTrainerCard = false;
 
     while (
         hand.length > 0 &&
         !hand.includes(CARD.EGGXECUTOREX) &&
-        hasPlayableCard(hand, playedProfessorResearch)
+        hasPlayableCard(hand, playedTrainerCard)
     ) {
         if (showDebugLogs) {
             console.log(
@@ -78,14 +84,20 @@ const doTurn = (hand: string[], deck: string[]) => {
                 hand.push(CARD.EGGXECUTE);
                 deck.splice(deck.indexOf(CARD.EGGXECUTE), 1);
             }
+            if (showDebugLogs) {
+                console.log(`Played Pokeball, ${hand}`);
+            }
             continue;
         }
 
-        if (hand.includes(CARD.PROFESSOR_RESEARCH)) {
+        if (hand.includes(CARD.PROFESSOR_RESEARCH) && !playedTrainerCard) {
             hand.splice(hand.indexOf(CARD.PROFESSOR_RESEARCH), 1);
-            playedProfessorResearch = true;
+            playedTrainerCard = true;
             drawCard(deck, hand);
             drawCard(deck, hand);
+            if (showDebugLogs) {
+                console.log(`Played Professor Research, ${hand}`);
+            }
             continue;
         }
 
@@ -109,7 +121,6 @@ const doTurn = (hand: string[], deck: string[]) => {
                 ];
             hand.push(card);
             deck.splice(deck.indexOf(card), 1);
-            deck.push;
 
             if (hasEggxecute) {
                 hand.splice(hand.indexOf(CARD.EGGXECUTE), 1);
@@ -119,6 +130,26 @@ const doTurn = (hand: string[], deck: string[]) => {
                 deck.push(CARD.EGGXECUTOR);
             }
 
+            if (showDebugLogs) {
+                console.log(`Played Pokemon Connection, ${hand}`);
+            }
+
+            continue;
+        }
+
+        if (hand.includes(CARD.IONO) && !playedTrainerCard) {
+            playedTrainerCard = true;
+            hand.splice(hand.indexOf(CARD.IONO), 1);
+            const handSize = hand.length;
+            deck = deck.concat(hand);
+            hand = [];
+            for (let i = 0; i < handSize; i++) {
+                drawCard(deck, hand);
+            }
+
+            if (showDebugLogs) {
+                console.log(`Played Iono, ${hand}`);
+            }
             continue;
         }
     }
@@ -147,6 +178,32 @@ const runSimulation = (simulationNumber: number) => {
     // Turn two
     if (showDebugLogs) {
         console.log(`Simulation ${simulationNumber}: Start Turn 2`);
+    }
+    drawCard(deck, hand);
+    if (hand.includes(CARD.EGGXECUTOREX)) {
+        return true;
+    }
+    doTurn(hand, deck);
+    if (hand.includes(CARD.EGGXECUTOREX)) {
+        return true;
+    }
+
+    // Turn three
+    if (showDebugLogs) {
+        console.log(`Simulation ${simulationNumber}: Start Turn 4`);
+    }
+    drawCard(deck, hand);
+    if (hand.includes(CARD.EGGXECUTOREX)) {
+        return true;
+    }
+    doTurn(hand, deck);
+    if (hand.includes(CARD.EGGXECUTOREX)) {
+        return true;
+    }
+
+    // Turn four
+    if (showDebugLogs) {
+        console.log(`Simulation ${simulationNumber}: Start Turn 4`);
     }
     drawCard(deck, hand);
     if (hand.includes(CARD.EGGXECUTOREX)) {
